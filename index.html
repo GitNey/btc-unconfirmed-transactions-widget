@@ -8,15 +8,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Unconfirmed Transactions</title>
   <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
+  <style>
+    #main {
+      box-shadow: 2px 1px 14px rgba(0,0,0,0.15);
+    }
+  </style>
 </head>
 
 <body class="container">
-  <div class="row p-2 mt-5 text-dark rounded border">
+  <div class="row p-2 mt-5 text-dark rounded border shadow">
     <b>1 Bitcoin = $<span id="price">0.00</span></b>
   </div>
   <div class="row mt-5">
     <div class="col-12">
-      <h2>Unconfirmed Transactions</h2>
+      <h2 id="title">Loading Unconfirmed Transactions...</h2>
       <ul id="main" class="list-group" class="w-100"></ul>
     </div>
   </div>
@@ -26,5 +31,6 @@
 <script src="./node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
 <script src="./js/helpers.js"></script>
+<script src="./js/UnconfirmedTransactions.js"></script>
 <script src="js/main.js"></script>
 </html>

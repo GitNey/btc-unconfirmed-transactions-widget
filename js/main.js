@@ -8,63 +8,8 @@ const LIMIT = 25
 
 let txs = []
 
-class UnconfirmedTransactions {
-  constructor (socketConnection = { url: '' }, limit = 25) {
-    this.socketConnection = socketConnection
-    this.limit = limit
-    this.connection = null
-    if (this.socketConnection.url !== '') {
-      this.attemptSocketConnection()
-    }
-  }
-
-  attemptSocketConnection () {
-    try {
-      const conn = new WebSocket(this.socketConnection.url)
-      this.connection = conn
-    } catch (err) {
-      throw err
-    }
-  }
-
-  bindEventOnSocketOpen (eventCb) {
-    try {
-      this.connection.addEventListener('open', eventCb)
-    } catch (err) {
-      throw err
-    }
-  }
-
-  bindEventOnSocketMessage (eventCb) {
-    try {
-      this.connection.onmessage = eventCb
-    } catch (err) {
-      throw err
-    }
-  }
-
-  getSocketState () {
-    if (this.connection) switch (this.connection.readyState) {
-      case (0):
-        return 'CONNECTING'
-      case (1):
-        return 'OPEN'
-      case (2):
-        return 'CLOSING'
-      case (3):
-        return 'CLOSED'
-      default:
-        break
-    }
-  }
-
-  sendMessage (messageObj) {
-    this.connection.send(JSON.stringify(messageObj))
-  }
-
-  closeConnection () {
-    this.connection.close('Closing connection...')
-  }
+function getFormattedUsdCurrency (value) {
+  return '$' + parseFloat(value, 10).toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, "$1,").toString()
 }
 
 function getPrice () {
@@ -78,6 +23,12 @@ function loop (state, socketObj) {
     // loop...
     window.console.log('Socket connection is:', socketObj.getSocketState())
     
+    if (!txs.length) {
+      $('#title').text('Loading Unconfirmed Transactions...')
+    } else {
+      $('#title').text('Unconfirmed Transactions:')
+    }
+
     txs.forEach(async tx => {
       const priceOfBitcoin = await getPrice()
       $('#price').text(priceOfBitcoin)
@@ -89,15 +40,14 @@ function loop (state, socketObj) {
       tx.output.forEach(output => {
         const liOut = $('<li />')
           .text(
-            `Address: ${output.addr},`,
-            `Bitcoin: ${output.value / Math.pow(10, 8)},`,
-            `Value: $${output.value / Math.pow(10, 8) * priceOfBitcoin}`
+            `Address: ${output.addr}, Bitcoin: ${output.value / Math.pow(10, 8)}, Value: ${getFormattedUsdCurrency(output.value / Math.pow(10, 8) * priceOfBitcoin)}`
           )
         ulOut.append(liOut)
         totalVal += output.value
       })
       const li = $('<li/>').attr('class', 'list-group-item')
-      const total = $('<span />').text(`Total Value: $${totalVal / Math.pow(10, 8) * priceOfBitcoin}`)
+      const total = $('<span />')
+        .text(`Total Value: ${getFormattedUsdCurrency(totalVal / Math.pow(10, 8) * priceOfBitcoin)}`)
       li.append(spanHash)
       li.append(spanTime)
       li.append(ulOut)
@@ -144,8 +94,8 @@ function main () {
         window.console.log('txs ->', txs)
       }
     })
+    unconfirmedTxs.bindEventOnSocketOpen(() => unconfirmedTxs.sendMessage({ "op": "unconfirmed_sub" }))
     setInterval(() => {
-      unconfirmedTxs.sendMessage({ "op": "unconfirmed_sub" })
       loop({ socketState: unconfirmedTxs.getSocketState() }, unconfirmedTxs)
     }, UPDATE_INTERVAL)
   }
