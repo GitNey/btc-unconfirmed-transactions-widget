@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unconfirmed Transactions</title>
+  <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
+</head>
+
+<body class="container">
+  <div class="row p-2 mt-5 text-dark rounded border">
+    <b>1 Bitcoin = $<span id="price">0.00</span></b>
+  </div>
+  <div class="row mt-5">
+    <div class="col-12">
+      <h2>Unconfirmed Transactions</h2>
+      <ul id="main" class="list-group" class="w-100"></ul>
+    </div>
+  </div>
+</body>
+
+<script src="./node_modules/jquery/dist/jquery.min.js"></script>
+<script src="./node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="./js/helpers.js"></script>
+<script src="js/main.js"></script>
+</html>
